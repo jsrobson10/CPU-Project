@@ -1,12 +1,14 @@
 
-#include <map>
+#include <unordered_map>
+#include <iostream>
 
+#include "instruction.hpp"
 #include "dynram.hpp"
 #include "memory.hpp"
 
-static std::map<uint64_t, uint8_t*> data;
-static uint64_t size_chunk = 1024;
-static uint64_t size_max = -1;
+static std::unordered_map<uint64_t, uint8_t*> data;
+static uint64_t size_chunk = 1024*1024;
+static uint64_t size_max = (uint64_t)1024*1024*1024*4;
 
 static uint8_t getter(uint64_t loc)
 {
@@ -32,6 +34,13 @@ static void setter(uint64_t loc, uint8_t val)
 
 	if(item == data.end())
 	{
+		if(data.size() * size_chunk >= size_max)
+		{
+			Instruction::exit("out of memory");
+
+			return;
+		}
+
 		buff = new uint8_t[size_chunk];
 		data[id] = buff;
 
@@ -51,8 +60,13 @@ static void setter(uint64_t loc, uint8_t val)
 
 void Dynram::reg(uint64_t loc, uint64_t len)
 {
-	Memory::Get::reg(loc, len, &getter);
-	Memory::Set::reg(loc, len, &setter);
+	Memory::Get::reg(loc, len, [loc](uint64_t at) {
+		return getter(loc + at);
+	});
+
+	Memory::Set::reg(loc, len, [loc](uint64_t at, uint8_t val) {
+		setter(loc + at, val);
+	});
 }
 
 void Dynram::setup(uint64_t p_size_chunk, uint64_t p_size_max)

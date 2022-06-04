@@ -60,7 +60,7 @@ uint8_t Get::int8(uint64_t loc)
 	{
 		if(loc >= g.min && loc <= g.max)
 		{
-			return g.func(loc);
+			return g.func(loc - g.min);
 		}
 	}
 
@@ -73,7 +73,7 @@ void Set::int8(uint64_t loc, uint8_t val)
 	{
 		if(loc >= s.min && loc <= s.max)
 		{
-			return s.func(loc, val);
+			return s.func(loc - s.min, val);
 		}
 	}
 }
@@ -104,6 +104,20 @@ uint64_t Get::int64(uint64_t loc)
 			((uint64_t)Get::int8(loc+7)));
 }
 
+float Get::intf(uint64_t loc)
+{
+	uint32_t v = Get::int32(loc);
+	
+	return *(float*)&v;
+}
+
+double Get::intd(uint64_t loc)
+{
+	uint64_t v = Get::int64(loc);
+	
+	return *(double*)&v;
+}
+
 void Set::int16(uint64_t loc, uint16_t val)
 {
 	Set::int8(loc+0, val >> 8);
@@ -130,16 +144,26 @@ void Set::int64(uint64_t loc, uint64_t val)
 	Set::int8(loc+7, val);
 }
 
-void Ram::init(uint64_t loc, uint64_t len, uint8_t* buff)
+void Set::intf(uint64_t loc, float val)
 {
-	Get::reg(loc, len, [loc, buff](uint64_t at)
+	Set::int32(loc, *(uint32_t*)&val);
+}
+
+void Set::intd(uint64_t loc, double val)
+{
+	Set::int64(loc, *(uint64_t*)&val);
+}
+
+void Ram::reg(uint64_t loc, uint64_t len, uint8_t* buff)
+{
+	Get::reg(loc, len, [buff](uint64_t at)
 	{
-		return buff[at - loc];
+		return buff[at];
 	});
 
-	Set::reg(loc, len, [loc, buff](uint64_t at, uint8_t val)
+	Set::reg(loc, len, [buff](uint64_t at, uint8_t val)
 	{
-		buff[at - loc] = val;
+		buff[at] = val;
 	});
 }
 

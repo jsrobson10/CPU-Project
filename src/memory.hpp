@@ -14,6 +14,8 @@ namespace Memory
 		void int16(uint64_t loc, uint16_t val);
 		void int32(uint64_t loc, uint32_t val);
 		void int64(uint64_t loc, uint64_t val);
+		void intf(uint64_t loc, float val);
+		void intd(uint64_t loc, double val);
 	};
 
 	namespace Get
@@ -24,11 +26,18 @@ namespace Memory
 		uint16_t int16(uint64_t loc);
 		uint32_t int32(uint64_t loc);
 		uint64_t int64(uint64_t loc);
+		float intf(uint64_t loc);
+		double intd(uint64_t loc);
 	};
 
 	namespace Ram
 	{
-		void init(uint64_t loc, uint64_t len, uint8_t* buff);
+		void reg(uint64_t loc, uint64_t len, uint8_t* buff);
+
+		const uint64_t ZERO  = 0x0000000000000000;
+		const uint64_t PROG  = 0x4000000000000000;
+		const uint64_t STACK = 0x8000000000000000;
+		const uint64_t IO    = 0xc000000000000000;
 	};
 };
 

@@ -1,11 +1,11 @@
 
 #include <iostream>
 
-#include <signal.h>
 #include <termios.h>
 
 #include "display.hpp"
 #include "memory.hpp"
+#include "instruction.hpp"
 
 static bool enabled = false;
 static uint64_t canvas_at;
@@ -13,27 +13,12 @@ static uint64_t canvas_len;
 static uint64_t canvas_w;
 static uint64_t canvas_h;
 
-static void signal_handler(int i)
-{
-	Display::disable();
-
-	exit(i);
-}
-
 void Display::setup(uint64_t loc, uint64_t w, uint64_t h)
 {
 	canvas_w = w;
 	canvas_h = h;
 	canvas_at = loc;
 	canvas_len = w*h;
-
-	static bool registered_signal = false;
-	if(!registered_signal)
-	{
-		signal(SIGINT, signal_handler);
-
-		registered_signal = true;
-	}
 }
 
 void Display::enable()
