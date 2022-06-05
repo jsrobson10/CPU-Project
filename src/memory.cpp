@@ -154,16 +154,25 @@ void Set::intd(uint64_t loc, double val)
 	Set::int64(loc, *(uint64_t*)&val);
 }
 
-void Ram::reg(uint64_t loc, uint64_t len, uint8_t* buff)
+void Get::reg(uint64_t loc, uint64_t len, const uint8_t* buff)
 {
 	Get::reg(loc, len, [buff](uint64_t at)
 	{
 		return buff[at];
 	});
+}
 
+void Set::reg(uint64_t loc, uint64_t len, uint8_t* buff)
+{
 	Set::reg(loc, len, [buff](uint64_t at, uint8_t val)
 	{
 		buff[at] = val;
 	});
+}
+
+void Ram::reg(uint64_t loc, uint64_t len, uint8_t* buff)
+{
+	Get::reg(loc, len, buff);
+	Set::reg(loc, len, buff);
 }
 
