@@ -213,12 +213,14 @@ void Instruction::next()
 			cursor += 3;
 			break;
 		case 14:	// DIV-U
-			setreg(0, safediv<uint64_t>(getreg(1), getreg(2)));
-			cursor += 3;
+			setreg(0, safediv<uint64_t>(getreg(2), getreg(3)));
+			setreg(1, getreg(2) % getreg(3));
+			cursor += 4;
 			break;
 		case 15:	// DIV
-			setreg(0, safediv<int64_t>(getreg(1), getreg(2)));
-			cursor += 3;
+			setreg(0, safediv<int64_t>(getreg(2), getreg(3)));
+			setreg(1, (int64_t)getreg(2) % (int64_t)getreg(3));
+			cursor += 4;
 			break;
 
 		case 16:	// ADD
