@@ -128,13 +128,13 @@ static void inst_goto()
 {
 	uint64_t loc;
 	
-	if(getreg(0)) {
-		loc = getreg(1);
-	} else {
+	if(getreg(1)) {
 		loc = getreg(2);
+	} else {
+		loc = getreg(3);
 	}
 
-	setreg(3, loc + 4);
+	setreg(0, loc + 4);
 
 	if(loc) {
 		cursor = loc;
@@ -149,12 +149,12 @@ void Instruction::next()
 
 	uint8_t inst = Get::int8(cursor++);
 
-	//std::cout << "Inst: " << (int)inst << std::endl;
+//	std::cout << "Inst: " << (int)inst << std::endl;
 
 	switch(inst)
 	{
 		default:
-			exit("invalid instruction");
+			exit("instruction " + std::to_string((int)inst) + " is invalid");
 			break;
 		case 0:		// EXIT
 			exit();
@@ -166,92 +166,92 @@ void Instruction::next()
 			inst_goto();
 			break;
 		case 3:		// EQUAL
-			setregb(2, getregb(0) == getregb(1));
+			setregb(0, getregb(1) == getregb(2));
 			cursor += 3;
 			break;
 
 		case 4:		// AND
-			setregb(2, getregb(0) && getregb(1));
+			setregb(0, getregb(1) && getregb(2));
 			cursor += 3;
 			break;
 		case 5:		// OR
-			setregb(2, getregb(0) || getregb(1));
+			setregb(0, getregb(1) || getregb(2));
 			cursor += 3;
 			break;
 		case 6:		// XOR
-			setregb(2, getregb(0) != getregb(1));
+			setregb(0, getregb(1) != getregb(2));
 			cursor += 3;
 			break;
 		case 7:		// NOT
-			setregb(1, !getregb(0));
+			setregb(0, !getregb(1));
 			cursor += 2;
 			break;
 
-		case 8:		// U-GTHAN
-			setregb(2, getreg(0) > getreg(1));
+		case 8:		// GTHAN-U
+			setregb(0, getreg(1) > getreg(2));
 			cursor += 3;
 			break;
 		case 9:		// GTHAN
-			setregb(2, (int64_t)getreg(0) > (int64_t)getreg(1));
+			setregb(0, (int64_t)getreg(1) > (int64_t)getreg(2));
 			cursor += 3;
 			break;
-		case 10:	// U-LTHAN
-			setregb(2, getreg(0) < getreg(1));
+		case 10:	// LTHAN-U
+			setregb(0, getreg(1) < getreg(2));
 			cursor += 3;
 			break;
 		case 11:	// LTHAN
-			setregb(2, (int64_t)getreg(0) < (int64_t)getreg(1));
+			setregb(0, (int64_t)getreg(1) < (int64_t)getreg(2));
 			cursor += 3;
 			break;
 
-		case 12:	// U-MUL
-			setreg(2, getreg(0) * getreg(1));
+		case 12:	// MUL-U
+			setreg(0, getreg(1) * getreg(2));
 			cursor += 3;
 			break;
 		case 13:	// MUL
-			setreg(2, (int64_t)getreg(0) * (int64_t)getreg(1));
+			setreg(0, (int64_t)getreg(1) * (int64_t)getreg(2));
 			cursor += 3;
 			break;
-		case 14:	// U-DIV
-			setreg(2, safediv<uint64_t>(getreg(0), getreg(1)));
+		case 14:	// DIV-U
+			setreg(0, safediv<uint64_t>(getreg(1), getreg(2)));
 			cursor += 3;
 			break;
 		case 15:	// DIV
-			setreg(2, safediv<int64_t>(getreg(0), getreg(1)));
+			setreg(0, safediv<int64_t>(getreg(1), getreg(2)));
 			cursor += 3;
 			break;
 
 		case 16:	// ADD
-			setreg(2, getreg(0) + getreg(1));
+			setreg(0, getreg(1) + getreg(2));
 			cursor += 3;
 			break;
 		case 17:	// SUB
-			setreg(2, getreg(0) - getreg(1));
+			setreg(0, getreg(1) - getreg(2));
 			cursor += 3;
 			break;
 		case 18:	// SHIFTR
-			setreg(2, getreg(0) >> (int64_t)getreg(1));
+			setreg(0, getreg(1) >> (int64_t)getreg(2));
 			cursor += 3;
 			break;
 		case 19:	// SHIFTL
-			setreg(2, getreg(0) << (int64_t)getreg(1));
+			setreg(0, getreg(1) << (int64_t)getreg(2));
 			cursor += 3;
 			break;
 
 		case 20:	// BIT-AND
-			setreg(2, getreg(0) & getreg(1));
+			setreg(0, getreg(1) & getreg(2));
 			cursor += 3;
 			break;
 		case 21:	// BIT-OR
-			setreg(2, getreg(0) | getreg(1));
+			setreg(0, getreg(1) | getreg(2));
 			cursor += 3;
 			break;
 		case 22:	// BIT-XOR
-			setreg(2, getreg(0) ^ getreg(1));
+			setreg(0, getreg(1) ^ getreg(2));
 			cursor += 3;
 			break;
 		case 23:	// BIT-NOT
-			setreg(1, !getreg(0));
+			setreg(0, !getreg(1));
 			cursor += 2;
 			break;
 
@@ -303,121 +303,121 @@ void Instruction::next()
 			break;
 
 		case 36:	// STORE-8
-			Set::int8(getreg(1), getreg(0));
+			Set::int8(getreg(0), getreg(1));
 			cursor += 2;
 			break;
 		case 37:	// STORE-16
-			Set::int16(getreg(1), getreg(0));
+			Set::int16(getreg(0), getreg(1));
 			cursor += 2;
 			break;
 		case 38:	// STORE-32
-			Set::int32(getreg(1), getreg(0));
+			Set::int32(getreg(0), getreg(1));
 			cursor += 2;
 			break;
 		case 39:	// STORE-64
-			Set::int64(getreg(1), getreg(0));
+			Set::int64(getreg(0), getreg(1));
 			cursor += 2;
 			break;
 
-		case 40:	// FLOAT-ADD
-			setregf(2, getregf(0) + getregf(1));
+		case 40:	// F-ADD
+			setregf(0, getregf(1) + getregf(2));
 			cursor += 3;
 			break;
-		case 41:	// FLOAT-SUB
-			setregf(2, getregf(0) - getregf(1));
+		case 41:	// F-SUB
+			setregf(0, getregf(1) - getregf(2));
 			cursor += 3;
 			break;
-		case 42:	// FLOAT-MUL
-			setregf(2, getregf(0) * getregf(1));
+		case 42:	// F-MUL
+			setregf(0, getregf(1) * getregf(2));
 			cursor += 3;
 			break;
-		case 43:	// FLOAT-DIV
-			setregf(2, getregf(0) / getregf(1));
+		case 43:	// F-DIV
+			setregf(0, getregf(1) / getregf(2));
 			cursor += 3;
 			break;
 
-		case 44:	// DOUBLE-ADD
-			setregd(2, getregd(0) + getregd(1));
+		case 44:	// D-ADD
+			setregd(0, getregd(1) + getregd(2));
 			cursor += 3;
 			break;
-		case 45:	// DOUBLE-SUB
-			setregd(2, getregd(0) - getregd(1));
+		case 45:	// D-SUB
+			setregd(0, getregd(1) - getregd(2));
 			cursor += 3;
 			break;
-		case 46:	// DOUBLE-MUL
-			setregd(2, getregd(0) * getregd(1));
+		case 46:	// D-MUL
+			setregd(0, getregd(1) * getregd(2));
 			cursor += 3;
 			break;
-		case 47:	// DOUBLE-DIV
-			setregd(2, getregd(0) / getregd(1));
+		case 47:	// D-DIV
+			setregd(0, getregd(1) / getregd(2));
 			cursor += 3;
 			break;
 		
-		case 48:	// FLOAT-SQRT
-			setregf(1, (float)std::sqrt(getregf(0)));
+		case 48:	// F-SQRT
+			setregf(0, (float)std::sqrt(getregf(1)));
 			cursor += 2;
 			break;
-		case 49:	// FLOAT-EQUAL
-			setregb(2, getregf(0) == getregf(1));
+		case 49:	// F-EQUAL
+			setregb(0, getregf(1) == getregf(2));
 			cursor += 3;
 			break;
-		case 50:	// FLOAT-GTHAN
-			setregb(2, getregf(0) > getregf(1));
+		case 50:	// F-GTHAN
+			setregb(0, getregf(1) > getregf(2));
 			cursor += 3;
 			break;
-		case 51:	// FLOAT-LTHAN
-			setregb(2, getregf(0) < getregf(1));
+		case 51:	// F-LTHAN
+			setregb(0, getregf(1) < getregf(2));
 			cursor += 3;
 			break;
 			
-		case 52:	// DOUBLE-SQRT
-			setregd(1, (float)std::sqrt(getregd(0)));
+		case 52:	// D-SQRT
+			setregd(0, (float)std::sqrt(getregd(1)));
 			cursor += 2;
 			break;
-		case 53:	// DOUBLE-EQUAL
-			setregb(2, getregd(0) == getregd(1));
+		case 53:	// D-EQUAL
+			setregb(0, getregd(1) == getregd(2));
 			cursor += 3;
 			break;
-		case 54:	// DOUBLE-GTHAN
-			setregb(2, getregd(0) > getregd(1));
+		case 54:	// D-GTHAN
+			setregb(0, getregd(1) > getregd(2));
 			cursor += 3;
 			break;
-		case 55:	// DOUBLE-LTHAN
-			setregb(2, getregd(0) < getregd(1));
+		case 55:	// D-LTHAN
+			setregb(0, getregd(1) < getregd(2));
 			cursor += 3;
 			break;
 
-		case 56:	// FLOAT-TO-UINT
-			setreg(1, (uint64_t)getregf(0));
+		case 56:	// F-TO-UINT
+			setreg(0, (uint64_t)getregf(1));
 			cursor += 2;
 			break;
-		case 57:	// FLOAT-TO-INT
-			setreg(1, (int64_t)getregf(0));
+		case 57:	// F-TO-INT
+			setreg(0, (int64_t)getregf(1));
 			cursor += 2;
 			break;
-		case 58:	// UINT-TO-FLOAT
-			setregf(1, (float)getreg(0));
+		case 58:	// UINT-TO-F
+			setregf(0, (float)getreg(1));
 			cursor += 2;
 			break;
-		case 59:	// INT-TO-FLOAT
-			setregf(1, (float)(int64_t)getreg(0));
+		case 59:	// INT-TO-F
+			setregf(0, (float)(int64_t)getreg(1));
 			cursor += 2;
 			break;
 
-		case 60:	// DOUBLE-TO-UINT
-			setreg(1, (uint64_t)getregd(0));
+		case 60:	// D-TO-UINT
+			setreg(0, (uint64_t)getregd(1));
 			cursor += 2;
 			break;
-		case 61:	// DOUBLE-TO-INT
-			setreg(1, (int64_t)getregd(0));
+		case 61:	// D-TO-INT
+			setreg(0, (int64_t)getregd(1));
 			cursor += 2;
 			break;
-		case 62:	// UINT-TO-DOUBLE
-			setregd(1, (double)getreg(0));
+		case 62:	// UINT-TO-D
+			setregd(0, (double)getreg(1));
 			cursor += 2;
 			break;
-		case 63:	// INT-TO-DOUBLE
-			setregd(1, (double)(int64_t)getreg(0));
+		case 63:	// INT-TO-D
+			setregd(0, (double)(int64_t)getreg(1));
 			cursor += 2;
 			break;
 

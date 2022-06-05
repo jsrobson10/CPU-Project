@@ -78,9 +78,9 @@ int main(int argc, const char** argv)
 			Display::render();
 		}
 
-		else if(micros - micros_i > 10)
+		else if(micros - micros_i > cpu_speed)
 		{
-			micros_i += 10;
+			micros_i += cpu_speed;
 
 			Instruction::next();
 		}
